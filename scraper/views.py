@@ -1,11 +1,14 @@
 from django.shortcuts import render
-from django.shortcuts import render
 from . import models
 from bs4 import BeautifulSoup
 import requests
 import json
 from .models import Product
 from django.contrib.auth.decorators import login_required
+import pandas as pd
+from matplotlib import pyplot as plt
+import numpy as np
+from django.core.files import File
 
 # Create your views here.
 @login_required(login_url='login')
@@ -85,7 +88,6 @@ def extract_result(request):
             features["useful"] = int(features["useful"])
             features["useless"] = int(features["useless"])
             features["content"] = remove_whitespaces(features["content"])
-            print(features['content'])
             features["pros"] = remove_whitespaces(features["pros"])
             features["cons"] = remove_whitespaces(features["cons"])
 
@@ -107,11 +109,34 @@ def extract_result(request):
 
         except IndexError:
             url = None
-    # Sprawdza czy oponion list nie jest pust
     # Jeśli jest to zwraca użytkownika do strony "extract/" z error message 'Nie znaliziono podanego Id'
     if len(opinions_list) == 0:
         return render(request, 'scraper/extract.html',
-                      {'error_msg': f"Produkt z takim id:{product_id} nie został znalieżionym"})
+                        {'error_msg': f"Produkt z takim id:{product_id} nie został znalieżionym"})
+
+    # Analiza opinii
+    opinions = pd.read_json(json.dumps(opinions_list))
+    opinions = opinions.set_index("opinion_id")
+
+    opinions["stars"] = opinions["stars"].map(lambda x: float(x.split("/")[0].replace(",", ".")))
+
+    # histogram częstości występowania poszczególnych ocen
+    stars = opinions["stars"].value_counts().sort_index().reindex(list(np.arange(0, 5.5, 0.5)), fill_value=0)
+    fig, ax = plt.subplots()
+    stars.plot.bar(color="lightskyblue")
+    ax.set_title("Gwiazdki")
+    ax.set_xlabel("liczba gwiazdek")
+    ax.set_ylabel("liczba opinii")
+    bar = plt.savefig(f'media/opinion_analyze/{product_id}_bar.png')
+    plt.close()
+
+    # udział poszczególnych rekomendacji w ogólnej liczbie opinii
+    recommendation = opinions["recommendation"].value_counts()
+    fig, ax = plt.subplots()
+    recommendation.plot.pie(label="", autopct="%1.1f%%", colors=['forestgreen', 'crimson'])
+    ax.set_title("Rekomendacje")
+    pie = plt.savefig(f'media/opinion_analyze/{product_id}_pie.png')
+    plt.close()
 
     # Jeśli ten id jest unikalny to dodaje go do bazy dannych
     try:
@@ -124,7 +149,9 @@ def extract_result(request):
             opinion_amount=opinion_amount,
             product_id=product_id,
             mean=sum(mean) / len(mean),
-            opinions_list=opinions_list
+            opinions_list=opinions_list,
+            bar=File(open(f"media/opinion_analyze/{product_id}_bar.png", "rb")),
+            pie=File(open(f"media/opinion_analyze/{product_id}_pie.png", "rb")),
         )
 
     context = {
@@ -133,6 +160,3 @@ def extract_result(request):
     }
 
     return render(request, 'scraper/extract_result.html', context)
-
-# Wyświtla wśystkie produkty znajdojących w bazie dannych
-
