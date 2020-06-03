@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Allen</title>
+</head>
+<body>
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags  }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% block content %}
+    <h1>This is home page</h1>
+    <ul>
+        <p>Hi, {{request.user}}</p>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+{% endblock %}
+</body>
+</html>

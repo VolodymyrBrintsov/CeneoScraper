@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div>
+    <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.username.label }}
+        {{ form.username }}
+
+        {{ form.email.label }}
+        {{ form.email }}
+
+        {{ form.password1.label }}
+        {{ form.password1 }}
+
+        {{ form.password2.label }}
+        {{ form.password2 }}
+    <div>
+        <button type="submit">Sign up</button>
+    </div>
+    </form>
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+        <small>
+            Already have an account? <a href="{% url 'login' %}">Sign up</a>
+        </small>
+</div>
+{% endblock %}
