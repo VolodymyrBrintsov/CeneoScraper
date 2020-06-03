@@ -2,8 +2,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
 from django.core.validators import ValidationError
+from django.contrib.auth import authenticate, login, logout, get_user_model
 
 
+User = get_user_model()
 
 class CreateUserForm(UserCreationForm):
     email = forms.EmailField(label='Email')

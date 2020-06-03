@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<table class="table">
+<table class="table" id="opinions">
   <thead>
     <tr>
       <th scope="col">Author</th>
@@ -32,4 +32,11 @@
   {% endfor %}
   </tbody>
 </table>
+{% endblock %}
+{% block scripts %}
+  <script>
+        $(document).ready( function () {
+            $('#opinions').DataTable();
+        } );
+  </script>
 {% endblock %}

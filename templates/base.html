@@ -25,7 +25,7 @@
                 <a class="navbar-brand" href="{% url 'home' %}"> Strona główna</a>
                 <a class="navbar-brand" href="{% url 'extract' %}"> Ekstrakcja opinii</a>
                 <a class="navbar-brand" href="{% url 'product_list' %}"> Lista produktow</a>
-                <a class="navbar-brand" href="#"> O projekcie</a>
+                <a class="navbar-brand" href="{% url 'about' %}"> O projekcie</a>
                 {% if user.is_authenticated %}
                     <p class="navbar-brand">Hi, {{request.user}}</p>
                     <a class="navbar-brand" href="{% url 'logout' %}">Logout</a>
@@ -52,3 +52,5 @@
         <footer class="container fixed-bottom alert alert-info">(c) Volodymyr Brintsov, Uniwersytet Ekonomiczny w Krakowie</footer>
     </body>
 </html>
+{% block scripts %}
+{% endblock %}

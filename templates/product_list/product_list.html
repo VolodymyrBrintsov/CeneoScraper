@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% if products %}
-<div class="container-fluid">
-    <table class="table table-dark">
+    <table class="table", id="product_list">
   <thead>
     <tr>
       <th scope="col">Product Id</th>
@@ -24,8 +23,14 @@
   {% endfor %}
   </tbody>
   </table>
-</div>
   {% else %}
   <p>Pusty</p>
   {% endif %}
+{% endblock %}
+{% block scripts %}
+  <script>
+        $(document).ready( function () {
+            $('#product_list').DataTable();
+        } );
+  </script>
 {% endblock %}
