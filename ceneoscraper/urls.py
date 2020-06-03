@@ -20,5 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('user.urls')),
     path('extract/', include('scraper.urls')),
-    path('product-list', include('product_list.urls')),
+    path('product-list/', include('products_list.urls')),
 ]

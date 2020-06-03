@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'markdown_deux',
     'crispy_forms',
     'scraper',
-    'product_list',
+    'products_list',
 ]
 
 MARKDOWN_DEUX_STYLES = {

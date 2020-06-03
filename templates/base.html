@@ -24,7 +24,7 @@
             <div class="">
                 <a class="navbar-brand" href="{% url 'home' %}"> Strona główna</a>
                 <a class="navbar-brand" href="{% url 'extract' %}"> Ekstrakcja opinii</a>
-                <a class="navbar-brand" href="#"> Lista produktow</a>
+                <a class="navbar-brand" href="{% url 'product_list' %}"> Lista produktow</a>
                 <a class="navbar-brand" href="#"> O projekcie</a>
                 {% if user.is_authenticated %}
                     <p class="navbar-brand">Hi, {{request.user}}</p>
