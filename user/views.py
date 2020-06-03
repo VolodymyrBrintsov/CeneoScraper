@@ -1,6 +1,5 @@
 from django.shortcuts import render
-
-# Create your views here.
+from markdown import markdown
 from django.shortcuts import render, redirect
 from .forms import CreateUserForm
 from django.contrib import messages
@@ -11,7 +10,9 @@ from django.contrib.auth.models import User
 
 @login_required(login_url='login')
 def home(request):
-    return render(request, 'base.html')
+    with open('README.md', 'r', encoding='UTF-8')as f:
+        content = f.read()
+    return render(request, 'base.html', {'content': content})
 
 def register_user(request):
     if request.user.is_authenticated:

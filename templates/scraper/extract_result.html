@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Author</th>
+      <th scope="col">Recomendation</th>
+      <th scope="col">Stars</th>
+      <th scope="col">Content</th>
+      <th scope="col">Wady</th>
+      <th scope="col">Zalety</th>
+      <th scope="col">Czy jest kupiona</th>
+      <th scope="col">Data kupowania</th>
+      <th scope="col">Data napisania kommentarzu</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for opinion in opinions %}
+    <tr>
+      <td>{{ opinion.author }}</td>
+      <td>{{ opinion.recommendation }}</td>
+      <td>{{ opinion.stars }}</td>
+      <td>{{ opinion.content }}</td>
+      <td>{{ opinion.cons }}</td>
+      <td>{{ opinion.pros }}</td>
+      <td>{{ opinion.purchased }}</td>
+      <td>{{ opinion.purchase_date }}</td>
+      <td>{{ opinion.review_date }}</td>
+    </tr>
+
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

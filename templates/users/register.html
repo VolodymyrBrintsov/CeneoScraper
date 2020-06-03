@@ -1,33 +1,31 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 {% block content %}
-
 <div>
-    <form method="POST" action="">
+    <h1>Register</h1>
+    <form action='', method="POST">
         {% csrf_token %}
-        {{ form.username.label }}
-        {{ form.username }}
+      <div class="form-group">
+        {{ form.username|as_crispy_field }}
+      </div>
 
-        {{ form.email.label }}
-        {{ form.email }}
+      <div class="form-group">
+        {{ form.email|as_crispy_field }}
+      </div>
 
-        {{ form.password1.label }}
-        {{ form.password1 }}
+      <div class="form-group">
+        {{ form.password1|as_crispy_field }}
+      </div>
 
-        {{ form.password2.label }}
-        {{ form.password2 }}
-    <div>
-        <button type="submit">Sign up</button>
-    </div>
+      <div class="form-group">
+        <label for="password2">Confirm Password:</label>
+        {{ form.password2|as_crispy_field }}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-        {% if form.errors %}
-            {% for field in form %}
-                {% for error in field.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-        {% endif %}
-        <small>
-            Already have an account? <a href="{% url 'login' %}">Sign up</a>
-        </small>
+    <small>
+        Already have an account? <a href="{% url 'login' %}">Sign up</a>
+    </small>
 </div>
 {% endblock %}
