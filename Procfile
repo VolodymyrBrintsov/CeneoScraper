@@ -1,1 +1,1 @@
-web: gunicorn ceneoscraper.wsgi --log-file -
+web: gunicorn ceneoscraper.wsgi
