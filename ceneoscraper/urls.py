@@ -23,4 +23,7 @@ urlpatterns = [
     path('', include('user.urls')),
     path('extract/', include('scraper.urls')),
     path('product-list/', include('products_list.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

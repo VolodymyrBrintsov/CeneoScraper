@@ -152,8 +152,8 @@ def extract_result(request):
             product_id=product_id,
             mean=sum(mean) / len(mean),
             opinions_list=opinions_list,
-            bar=File(open(f"media/opinion_analyze/{product_id}_bar.png", "rb")),
-            pie=File(open(f"media/opinion_analyze/{product_id}_pie.png", "rb")),
+            bar=f"opinion_analyze/{product_id}_bar.png",
+            pie=f"opinion_analyze/{product_id}_pie.png",
         )
 
     context = {
