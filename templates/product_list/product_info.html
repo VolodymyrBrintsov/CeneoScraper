@@ -1,37 +1,53 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<table class="table", id="opinions">
-  <thead>
-    <tr>
-      <th scope="col">Author</th>
-      <th scope="col">Recomendation</th>
-      <th scope="col">Stars</th>
-      <th scope="col">Content</th>
-      <th scope="col">Wady</th>
-      <th scope="col">Zalety</th>
-      <th scope="col">Czy jest kupiona</th>
-      <th scope="col">Data kupowania</th>
-      <th scope="col">Data napisania kommentarzu</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for opinion in opinions %}
-    <tr>
-      <td>{{ opinion.author }}</td>
-      <td>{{ opinion.recommendation }}</td>
-      <td>{{ opinion.stars }}</td>
-      <td>{{ opinion.content }}</td>
-      <td>{{ opinion.cons }}</td>
-      <td>{{ opinion.pros }}</td>
-      <td>{{ opinion.purchased }}</td>
-      <td>{{ opinion.purchase_date }}</td>
-      <td>{{ opinion.review_date }}</td>
-    </tr>
-
-  {% endfor %}
-  </tbody>
-</table>
+<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+  <ol class="carousel-indicators">
+    <li data-target="#carouselExampleIndicators"  data-slide-to="0" class="active" style="background-color:powderblue;"></li>
+    <li data-target="#carouselExampleIndicators" data-slide-to="1" style="background-color:powderblue;"></li>
+    <li data-target="#carouselExampleIndicators" data-slide-to="2" style="background-color:powderblue;"></li>
+  </ol>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <table class="table" id="opinions">
+        <thead>
+          <tr>
+            <th scope="col">Author</th>
+            <th scope="col">Recomendation</th>
+            <th scope="col">Stars</th>
+            <th scope="col">Content</th>
+            <th scope="col">Wady</th>
+            <th scope="col">Zalety</th>
+            <th scope="col">Czy jest kupiona</th>
+            <th scope="col">Data kupowania</th>
+            <th scope="col">Data napisania kommentarzu</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for opinion in opinions %}
+          <tr>
+            <td>{{ opinion.author }}</td>
+            <td>{{ opinion.recommendation }}</td>
+            <td>{{ opinion.stars }}</td>
+            <td>{{ opinion.content }}</td>
+            <td>{{ opinion.cons }}</td>
+            <td>{{ opinion.pros }}</td>
+            <td>{{ opinion.purchased }}</td>
+            <td>{{ opinion.purchase_date }}</td>
+            <td>{{ opinion.review_date }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="carousel-item">
+      <img class="d-block w-100" src="{{ pie }}" alt="Second slide">
+    </div>
+    <div class="carousel-item">
+      <img class="d-block w-100" src="{{ bar }}" alt="Third slide">
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block scripts %}
   <script>

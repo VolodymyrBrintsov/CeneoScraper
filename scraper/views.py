@@ -6,6 +6,8 @@ import json
 from .models import Product
 from django.contrib.auth.decorators import login_required
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 from django.core.files import File
@@ -127,7 +129,7 @@ def extract_result(request):
     ax.set_title("Gwiazdki")
     ax.set_xlabel("liczba gwiazdek")
     ax.set_ylabel("liczba opinii")
-    bar = plt.savefig(f'media/opinion_analyze/{product_id}_bar.png')
+    plt.savefig(f'media/opinion_analyze/{product_id}_bar.png')
     plt.close()
 
     # udział poszczególnych rekomendacji w ogólnej liczbie opinii
@@ -135,7 +137,7 @@ def extract_result(request):
     fig, ax = plt.subplots()
     recommendation.plot.pie(label="", autopct="%1.1f%%", colors=['forestgreen', 'crimson'])
     ax.set_title("Rekomendacje")
-    pie = plt.savefig(f'media/opinion_analyze/{product_id}_pie.png')
+    plt.savefig(f'media/opinion_analyze/{product_id}_pie.png')
     plt.close()
 
     # Jeśli ten id jest unikalny to dodaje go do bazy dannych
@@ -155,8 +157,9 @@ def extract_result(request):
         )
 
     context = {
-        'comments_amount': len(opinions_list),
-        'opinions': Product.objects.get(product_id=product_id).opinions_list
+        'opinions': Product.objects.get(product_id=product_id).opinions_list,
+        'pie': Product.objects.get(product_id=product_id).pie.url,
+        'bar': Product.objects.get(product_id=product_id).bar.url,
     }
 
     return render(request, 'scraper/extract_result.html', context)

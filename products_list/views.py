@@ -9,4 +9,9 @@ def product_list(request):
 
 @login_required(login_url='login')
 def product_info(request, product_id):
-    return render(request, 'product_list/product_info.html', {'opinions': Product.objects.get(product_id=product_id).opinions_list})
+    context = {
+        'opinions': Product.objects.get(product_id=product_id).opinions_list,
+        'pie': Product.objects.get(product_id=product_id).pie.url,
+        'bar': Product.objects.get(product_id=product_id).bar.url,
+    }
+    return render(request, 'product_list/product_info.html', context)
