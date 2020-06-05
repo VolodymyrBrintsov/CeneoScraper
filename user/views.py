@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 
-@login_required(login_url='login')
 def home(request):
     with open('README.md', 'r', encoding='UTF-8')as f:
         content = f.read()

@@ -1,7 +1,8 @@
 # CeneoScraper
 Aplikacja pozwala na pobieranie, oraz analizę opinii o produktach ze strony Ceneo.pl, co uchroni Cię przed nietrafionym zakupem
 # Jak korzystać?
-- Trzeba kliknąć na "Ekstrakcja opinii"
+- Trzeba zalogować lub zarejestrować konto
+- Kliknąć na "Ekstrakcja opinii"
 - Wpisać kod produktu, który jest ciekawy dla Państwa
 - Każdy nowy kod będżie zapisany do bazy dannych postgreSQL oraz opinii o tym produkcie. Znależione produkty będą wyświetlane w "Lista produktow"
 - Po poberaniu dannych będżie możliwe popatrzyć na statystyczne dane oraz pobrać plik z dannymi

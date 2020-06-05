@@ -29,6 +29,9 @@
                 {% if user.is_authenticated %}
                     <p class="navbar-brand">Hi, {{request.user}}</p>
                     <a class="navbar-brand" href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a class="navbar-brand" href="{% url 'login' %}">Login</a>
+                    <a class="navbar-brand" href="{% url 'register' %}">Register</a>
                 {% endif %}
             </div>
         </nav>
@@ -42,7 +45,7 @@
                             {{ message }}
                         </div>
                         {% endfor %}
-                        {% endif %}
+                    {% endif %}
                     {% block content %}
                         {{ content|markdown }}
                     {% endblock %}
