@@ -17,12 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from user.views import logout_user, register_user, login_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('user.urls')),
-    path('extract/', include('scraper.urls')),
-    path('product-list/', include('products_list.urls')),
+    path('login/', login_user, name='login'),
+    path('logout/', logout_user, name='logout'),
+    path('register/', register_user, name='register'),
+    path('', include('scraper.urls')),
 ]
 
 if settings.DEBUG:

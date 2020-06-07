@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <form method="POST" action="{% url 'extract_result' %}">
+    <form method="POST">
         {% csrf_token %}
         <h3><b>Aby pobrać opinię wprowadź ID produktu</b></h3>
         <br>

@@ -9,11 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 
-def home(request):
-    with open('README.md', 'r', encoding='UTF-8')as f:
-        content = f.read()
-    return render(request, 'base.html', {'content': content})
-
 def register_user(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -45,6 +40,3 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('login')
-
-def about(request):
-    return render(request, 'users/about.html')
