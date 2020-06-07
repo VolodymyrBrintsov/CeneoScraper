@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from bs4 import BeautifulSoup
 import requests
 import json
@@ -178,6 +178,7 @@ def product_list(request):
 
 @login_required(login_url='login')
 def product_info(request, product_id):
+    get_object_or_404(Product, product_id=product_id)
     context = {
         'opinions': Product.objects.get(product_id=product_id).opinions_list,
         'pie': Product.objects.get(product_id=product_id).pie.url,
