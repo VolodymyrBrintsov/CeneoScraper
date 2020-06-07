@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import JSONField
 
 class Product(models.Model):
     product_id = models.IntegerField()
+    product_name = models.TextField(default='')
     opinion_amount = models.IntegerField()
     cons_amount = models.IntegerField()
     pros_amount = models.IntegerField()

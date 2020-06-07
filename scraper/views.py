@@ -1,21 +1,21 @@
-from django.shortcuts import render
-from . import models
+from django.shortcuts import render, redirect
 from bs4 import BeautifulSoup
 import requests
 import json
 from .models import Product
+from .forms import SearchForm
 from django.contrib.auth.decorators import login_required
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
-from django.core.files import File
+from django.forms.utils import ErrorList
 
 # Create your views here.
 @login_required(login_url='login')
 def extract(request):
-    return render(request, 'scraper/extract.html')
+    return render(request, 'scraper/extract.html', {'form': SearchForm()})
 
 @login_required(login_url='login')
 def extract_result(request):
@@ -57,109 +57,113 @@ def extract_result(request):
                 text = text.replace(char, ". ")
             return text
         except AttributeError:
-            pass
+             pass
 
     # adres URL strony z opiniami
     url_prefix = "https://www.ceneo.pl"
     url_postfix = "#tab=reviews"
 
-    # Sprawdza czy jest podany produkt id je integer
-    try:
-        product_id = int(request.POST.get('product_id'))
+    form = SearchForm(request.POST)
+    if form.is_valid():
+        product_id = str(form.cleaned_data['id'])
+        url = url_prefix + "/" + product_id + url_postfix
 
-    # Jeśli nie to zwraca użytkownika do strony "extract" z error messege że podane id jest niepoprawne
-    except:
-        return render(request, 'scraper/extract.html', {"error_msg": "Nie prawidlowo podane ID!"})
-    url = url_prefix + "/" + str(product_id) + url_postfix
-
-    # pusta lista na opinie
-    opinions_list = []
-    while url is not None:
-        # pobranie kodu HTML strony z adresu URL
-        page_response = requests.get(url)
+        #Check if this page with opinions exists
+        page_response = requests.get("https://www.ceneo.pl/" + product_id)
         page_tree = BeautifulSoup(page_response.text, 'html.parser')
-        # wybranie z kodu strony fragmentów odpowiadających poszczególnym opiniom
-        opinions = page_tree.select("div.js_product-review")
+        product_name = page_tree.select("h1.product-name")
 
-        # ekstrakcja składowyh dla pojedynczej opinii z listy
-        for opinion in opinions:
-            features = {key: extract_feature(opinion, *args)
-                        for key, args in selectors.items()}
-            features["opinion_id"] = int(opinion["data-entry-id"])
-            features["purchased"] = True if features["purchased"] == "Opinia potwierdzona zakupem" else False
-            features["useful"] = int(features["useful"])
-            features["useless"] = int(features["useless"])
-            features["content"] = remove_whitespaces(features["content"])
-            features["pros"] = remove_whitespaces(features["pros"])
-            features["cons"] = remove_whitespaces(features["cons"])
+        # pusta lista na opinie
+        opinions_list = []
+        while url is not None:
+            # pobranie kodu HTML strony z adresu URL
+            page_response = requests.get(url)
+            page_tree = BeautifulSoup(page_response.text, 'html.parser')
+            # wybranie z kodu strony fragmentów odpowiadających poszczególnym opiniom
+            opinions = page_tree.select("div.js_product-review")
 
-            opinions_list.append(features)
-            opinion_amount += 1
+            # ekstrakcja składowyh dla pojedynczej opinii z listy
+            for opinion in opinions:
+                features = {key: extract_feature(opinion, *args)
+                            for key, args in selectors.items()}
+                features["opinion_id"] = int(opinion["data-entry-id"])
+                features["purchased"] = True if features["purchased"] == "Opinia potwierdzona zakupem" else False
+                features["useful"] = int(features["useful"])
+                features["useless"] = int(features["useless"])
+                features["content"] = remove_whitespaces(features["content"])
+                features["pros"] = remove_whitespaces(features["pros"])
+                features["cons"] = remove_whitespaces(features["cons"])
 
-            if features['cons'] != "":
-                cons_amount += 1
+                opinions_list.append(features)
+                opinion_amount += 1
 
-            if features['pros'] != "":
-                pros_amount += 1
+                if features['cons'] != "":
+                    cons_amount += 1
 
-            mean.append(int(features['stars'][0]))
+                if features['pros'] != "":
+                    pros_amount += 1
 
+                mean.append(int(features['stars'][0]))
+
+            try:
+                url = url_prefix + \
+                      page_tree.select(
+                          f'a.pagination__next[href*="{product_id}/op"]')[0]["href"]
+
+            except IndexError:
+                url = None
+
+        # Check if opinions for current product exist
+        if not opinions_list or not product_name:
+            form.add_error('id', f'Nie znaliżiono opinij dla produktu z id: {product_id}.')
+            return render(request, 'scraper/extract.html', {'form': form})
+
+        # Analiza opinii
+        opinions = pd.read_json(json.dumps(opinions_list))
+        opinions = opinions.set_index("opinion_id")
+
+        opinions["stars"] = opinions["stars"].map(lambda x: float(x.split("/")[0].replace(",", ".")))
+
+        # histogram częstości występowania poszczególnych ocen
+        stars = opinions["stars"].value_counts().sort_index().reindex(list(np.arange(0, 5.5, 0.5)), fill_value=0)
+        fig, ax = plt.subplots()
+        stars.plot.bar(color="lightskyblue")
+        ax.set_title("Gwiazdki")
+        ax.set_xlabel("liczba gwiazdek")
+        ax.set_ylabel("liczba opinii")
+        plt.savefig(f'media/opinion_analyze/{product_id}_bar.png')
+        plt.close()
+
+        # udział poszczególnych rekomendacji w ogólnej liczbie opinii
+        recommendation = opinions["recommendation"].value_counts()
+        fig, ax = plt.subplots()
+        recommendation.plot.pie(label="", autopct="%1.1f%%", colors=['forestgreen', 'crimson'])
+        ax.set_title("Rekomendacje")
+        plt.savefig(f'media/opinion_analyze/{product_id}_pie.png')
+        plt.close()
+
+        # Jeśli ten id jest unikalny to dodaje go do bazy dannych
         try:
-            url = url_prefix + \
-                  page_tree.select(
-                      f'a.pagination__next[href*="{product_id}/op"]')[0]["href"]
+            Product.objects.get(product_id=product_id)
 
-        except IndexError:
-            url = None
-    # Jeśli jest to zwraca użytkownika do strony "extract/" z error message 'Nie znaliziono podanego Id'
-    if len(opinions_list) == 0:
-        return render(request, 'scraper/extract.html',
-                        {'error_msg': f"Produkt z takim id:{product_id} nie został znalieżionym"})
+        except (Product.MultipleObjectsReturned, Product.DoesNotExist):
+            Product.objects.create(
+                pros_amount=pros_amount,
+                cons_amount=cons_amount,
+                opinion_amount=opinion_amount,
+                product_id=product_id,
+                product_name=product_name[0].string,
+                mean=sum(mean) / len(mean),
+                opinions_list=opinions_list,
+                bar=f"opinion_analyze/{product_id}_bar.png",
+                pie=f"opinion_analyze/{product_id}_pie.png",
+            )
 
-    # Analiza opinii
-    opinions = pd.read_json(json.dumps(opinions_list))
-    opinions = opinions.set_index("opinion_id")
+        context = {
+            'opinions': Product.objects.get(product_id=product_id).opinions_list,
+            'pie': Product.objects.get(product_id=product_id).pie.url,
+            'bar': Product.objects.get(product_id=product_id).bar.url,
+        }
 
-    opinions["stars"] = opinions["stars"].map(lambda x: float(x.split("/")[0].replace(",", ".")))
-
-    # histogram częstości występowania poszczególnych ocen
-    stars = opinions["stars"].value_counts().sort_index().reindex(list(np.arange(0, 5.5, 0.5)), fill_value=0)
-    fig, ax = plt.subplots()
-    stars.plot.bar(color="lightskyblue")
-    ax.set_title("Gwiazdki")
-    ax.set_xlabel("liczba gwiazdek")
-    ax.set_ylabel("liczba opinii")
-    plt.savefig(f'media/opinion_analyze/{product_id}_bar.png')
-    plt.close()
-
-    # udział poszczególnych rekomendacji w ogólnej liczbie opinii
-    recommendation = opinions["recommendation"].value_counts()
-    fig, ax = plt.subplots()
-    recommendation.plot.pie(label="", autopct="%1.1f%%", colors=['forestgreen', 'crimson'])
-    ax.set_title("Rekomendacje")
-    plt.savefig(f'media/opinion_analyze/{product_id}_pie.png')
-    plt.close()
-
-    # Jeśli ten id jest unikalny to dodaje go do bazy dannych
-    try:
-        Product.objects.get(product_id=product_id)
-
-    except (Product.MultipleObjectsReturned, Product.DoesNotExist):
-        Product.objects.create(
-            pros_amount=pros_amount,
-            cons_amount=cons_amount,
-            opinion_amount=opinion_amount,
-            product_id=product_id,
-            mean=sum(mean) / len(mean),
-            opinions_list=opinions_list,
-            bar=f"opinion_analyze/{product_id}_bar.png",
-            pie=f"opinion_analyze/{product_id}_pie.png",
-        )
-
-    context = {
-        'opinions': Product.objects.get(product_id=product_id).opinions_list,
-        'pie': Product.objects.get(product_id=product_id).pie.url,
-        'bar': Product.objects.get(product_id=product_id).bar.url,
-    }
-
-    return render(request, 'scraper/extract_result.html', context)
+        return render(request, 'scraper/extract_result.html', context)
+    return render(request, 'scraper/extract.html', {'form': SearchForm(request.POST)})

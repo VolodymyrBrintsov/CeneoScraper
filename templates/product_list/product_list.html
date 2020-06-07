@@ -5,6 +5,7 @@
   <thead>
     <tr>
       <th scope="col">Product Id</th>
+      <th scope="col">Product Name</th>
       <th scope="col">Ilość Opinij</th>
       <th scope="col">Ilość Zalet</th>
       <th scope="col">Ilość Wad</th>
@@ -15,6 +16,7 @@
   {% for product in products %}
     <tr>
       <td><a href="{% url 'product_info' product.product_id %}">{{ product.product_id }}</a></td>
+      <td>{{ product.product_name }}</td>
       <td>{{ product.opinion_amount }}</td>
       <td>{{ product.pros_amount }}</td>
       <td>{{ product.cons_amount }}</td>
