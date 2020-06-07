@@ -174,7 +174,7 @@ def extract(request):
 # Create your views here.
 @login_required(login_url='login')
 def product_list(request):
-    return render(request, 'product_list/product_list.html', {'products': Product.objects.all()})
+    return render(request, 'scraper/product_list.html', {'products': Product.objects.all()})
 
 @login_required(login_url='login')
 def product_info(request, product_id):
@@ -183,5 +183,6 @@ def product_info(request, product_id):
         'opinions': Product.objects.get(product_id=product_id).opinions_list,
         'pie': Product.objects.get(product_id=product_id).pie.url,
         'bar': Product.objects.get(product_id=product_id).bar.url,
+        'product_id': product_id
     }
-    return render(request, 'product_list/product_info.html', context)
+    return render(request, 'scraper/product_info.html', context)

@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <a href="{{ pie }}" style="width:100%" class="btn btn-primary" download="{{ product_id }}_pie.png">Download Pie</a>
+    </div>
+    <div class="col-lg-6">
+        <a href="{{ bar }}" style="width:100%" class="btn btn-primary" download="{{ product_id }}_bar.png">Download Bar</a>
+    </div>
+</div>
+<hr>
 <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
   <ol class="carousel-indicators">
     <li data-target="#carouselExampleIndicators"  data-slide-to="0" class="active" style="background-color:powderblue;"></li>
