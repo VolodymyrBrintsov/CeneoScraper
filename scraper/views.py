@@ -118,6 +118,7 @@ def extract(request):
                 form.add_error('id', f'Nie znaliżiono opinij dla produktu z id: {product_id}.')
                 return render(request, 'scraper/extract.html', {'form': form})
 
+            #Dopóki nie znajdzie imie produktu (zrobione dla tego że link może otwórzyć nie od razu)
             product_name = None
             while product_name == None:
                 page_response = requests.get("https://www.ceneo.pl/" + product_id)

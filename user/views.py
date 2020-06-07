@@ -34,6 +34,7 @@ def login_user(request):
             if form.is_valid():
                 login(request, form.user_cache)
                 return redirect('home')
+            return render(request, 'users/login.html', {'form': form})
         return render(request, 'users/login.html', {'form': form})
 
 @login_required(login_url='login')
