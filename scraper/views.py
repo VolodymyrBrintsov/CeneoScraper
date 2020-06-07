@@ -68,11 +68,6 @@ def extract_result(request):
         product_id = str(form.cleaned_data['id'])
         url = url_prefix + "/" + product_id + url_postfix
 
-        #Check if this page with opinions exists
-        page_response = requests.get("https://www.ceneo.pl/" + product_id)
-        page_tree = BeautifulSoup(page_response.text, 'html.parser')
-        product_name = page_tree.select("h1.product-name")
-
         # pusta lista na opinie
         opinions_list = []
         while url is not None:
@@ -114,9 +109,16 @@ def extract_result(request):
                 url = None
 
         # Check if opinions for current product exist
-        if not opinions_list or not product_name:
+        if not opinions_list:
             form.add_error('id', f'Nie znaliżiono opinij dla produktu z id: {product_id}.')
             return render(request, 'scraper/extract.html', {'form': form})
+
+        product_name = None
+        while product_name == None:
+            page_response = requests.get("https://www.ceneo.pl/" + product_id)
+            page_tree = BeautifulSoup(page_response.text, 'html.parser')
+            product_name = page_tree.select("h1.product-name")
+            print(product_name)
 
         # Analiza opinii
         opinions = pd.read_json(json.dumps(opinions_list))
